@@ -4,8 +4,13 @@ env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true # 全局启用Node24，消除警告
 on:
   schedule:
-    - cron: '0 1-10 * * *'  # 每小时运行一次
-  workflow_dispatch:
+    - cron: '0 1-10 * * *'   # 保留，做兜底
+  workflow_dispatch:          # 允许外部 API 触发
+    inputs:
+      reason:
+        description: 'Trigger reason'
+        required: false
+        default: 'external cron'
 
 jobs:
   build:
