@@ -273,7 +273,7 @@ def task_hotlist():
     if "3" in ENABLED_PAGES:
         print("生成 Page 3: 热搜 (下)...")
         # 🔧修改点 3：将 '1' 改为 'L'
-        img2 = Image.new('1', (400, 300), color=255)
+        img3 = Image.new('1', (400, 300), color=255)
         start_index = next_s if "1" in ENABLED_PAGES else 7
         draw_list(ImageDraw.Draw(img3), f"◆ {title_display} (三)", titles, start_index)
         push_image(img3, 3)
