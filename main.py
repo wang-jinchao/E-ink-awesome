@@ -170,7 +170,7 @@ def get_hotlist_data(source):
 
                 # 新增 60s 热搜接口适配，解析接口返回的标题数据
         elif source == "60s":
-            url = "https://60s.superjeason.qzz.io/v2/60s"  # 你指定的接口地址
+            url = "https://60s.zellon.top/v2/60s"  # 你指定的接口地址
             res = requests.get(url, headers=HEADERS, timeout=10).json()
             # 解析接口数据：提取每日热点标题
             titles = [item['title'] for item in res.get('data', {}).get('items', [])]
