@@ -15,7 +15,7 @@ from zhdate import ZhDate
 ENABLED_PAGES = "1,2,3,4"
 
 # 2. 热搜源设置：目前支持 'zhihu', 'bilibili', 'github'
-HOTLIST_SOURCE = "github"  # 在这里修改你想看的热搜源
+HOTLIST_SOURCE = "60s"  # 在这里修改你想看的热搜源
 
 # 3. 天气城市设置
 # 高德天气城市代码（默认：天津市津南区 120112，北京是 110000）
@@ -167,6 +167,13 @@ def get_hotlist_data(source):
             url = f"https://api.github.com/search/repositories?q=stars:>500+created:>{date_str}&sort=stars&order=desc"
             res = requests.get(url, headers=HEADERS, timeout=10).json()
             titles = [f"{item['full_name']}: {item['description'][:50] if item['description'] else 'No desc'}" for item in res['items']]
+
+                # 新增 60s 热搜接口适配，解析接口返回的标题数据
+        elif source == "60s":
+            url = "https://60s.superjeason.qzz.io/v2/60s"  # 你指定的接口地址
+            res = requests.get(url, headers=HEADERS, timeout=10).json()
+            # 解析接口数据：提取每日热点标题
+            titles = [item['title'] for item in res.get('data', {}).get('items', [])]
         else:
             titles = ["不支持的数据源"]
     except Exception as e:
@@ -180,7 +187,7 @@ def task_hotlist():
     if "1" not in ENABLED_PAGES and "2" not in ENABLED_PAGES:
         return
         
-    source_map = {"zhihu": "知乎热榜", "bilibili": "B站热搜", "github": "GitHub 热门"}
+    source_map = {"zhihu": "知乎热榜", "bilibili": "B站热搜", "github": "GitHub 热门","60s": "60s热点"}
     titles = get_hotlist_data(HOTLIST_SOURCE)
     title_display = source_map.get(HOTLIST_SOURCE, "热门看板")
 
