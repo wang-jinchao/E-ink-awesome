@@ -171,9 +171,17 @@ def get_hotlist_data(source):
                 # 新增 60s 热搜接口适配，解析接口返回的标题数据
         elif source == "60s":
             url = "https://60s.zellon.top/v2/60s"  # 你指定的接口地址
-            res = requests.get(url, headers=HEADERS, timeout=10).json()
-            # 解析接口数据：提取每日热点标题
-            titles = [item['title'] for item in res.get('data', {}).get('items', [])]
+            news_list = res.get('data', {}).get('news', res.get('news', []))
+            if isinstance(news_list, list):
+                # 若news元素是字典，取title；若直接是字符串，直接用
+                titles = [
+                    item['title'] if isinstance(item, dict) and 'title' in item 
+                    else str(item) 
+                    for item in news_list
+                ]
+            else:
+                # 兜底：若news不是列表，返回提示
+                titles = ["60s接口返回的news格式异常"]
         else:
             titles = ["不支持的数据源"]
     except Exception as e:
