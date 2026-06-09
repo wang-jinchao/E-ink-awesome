@@ -12,7 +12,7 @@ from zhdate import ZhDate
 
 # 1. 控制推送哪几页？
 # 墨水屏共 5 页：1=热搜上, 2=热搜下, 3=日历, 4=天气
-ENABLED_PAGES = "1,2,3,4"
+ENABLED_PAGES = "1,2,3,4,5"
 
 # 2. 热搜源设置：目前支持 'zhihu', 'bilibili', 'github'
 HOTLIST_SOURCE = "60s"  # 在这里修改你想看的热搜源
@@ -189,7 +189,7 @@ def get_hotlist_data(source):
 
 # --- 任务：热搜看板 ---
 def task_hotlist():
-    if "1" not in ENABLED_PAGES and "2" not in ENABLED_PAGES:
+    if "1" not in ENABLED_PAGES and "2" not in ENABLED_PAGES and "3" not in ENABLED_PAGES:
         return
         
     source_map = {"zhihu": "知乎热榜", "bilibili": "B站热搜", "github": "GitHub 热门","60s": "60s热点"}
@@ -263,18 +263,26 @@ def task_hotlist():
         push_image(img1, 1)
 
     if "2" in ENABLED_PAGES:
-        print("生成 Page 2: 热搜 (下)...")
+        print("生成 Page 2: 热搜 (中)...")
         # 🔧修改点 2：将 '1' 改为 'L'
         img2 = Image.new('1', (400, 300), color=255)
         start_index = next_s if "1" in ENABLED_PAGES else 7
         draw_list(ImageDraw.Draw(img2), f"◆ {title_display} (二)", titles, start_index)
         push_image(img2, 2)
 
+    if "3" in ENABLED_PAGES:
+        print("生成 Page 3: 热搜 (下)...")
+        # 🔧修改点 3：将 '1' 改为 'L'
+        img2 = Image.new('1', (400, 300), color=255)
+        start_index = next_s if "1" in ENABLED_PAGES else 7
+        draw_list(ImageDraw.Draw(img3), f"◆ {title_display} (三)", titles, start_index)
+        push_image(img3, 3)
+
 # --- 任务：日历（保持不变） ---
 def task_calendar():
-    if "3" not in ENABLED_PAGES: return
-    print("生成 Page 3: 日历...")
-    # 🔧修改点 3：将 '1' 改为 'L'
+    if "4" not in ENABLED_PAGES: return
+    print("生成 Page 4: 日历...")
+    # 🔧修改点 4：将 '1' 改为 'L'
     img = Image.new('1', (400, 300), color=255)
     draw = ImageDraw.Draw(img)
     now_utc = datetime.utcnow()
@@ -309,7 +317,7 @@ def task_calendar():
                     else:
                         draw.text((dx+2, curr_y+18), bottom_text, font=font_tiny, fill=0)
         curr_y += row_h
-    push_image(img, 3)
+    push_image(img, 4)
 
 # --- 混合天气获取（保持不变） ---
 def get_hybrid_weather():
@@ -386,16 +394,16 @@ def get_hybrid_weather():
 
 # --- 任务：天气看板 ---
 def task_weather_dashboard():
-    if "4" not in ENABLED_PAGES: return
-    print("生成 Page 4: 混合天气看板...")
-    # 🔧修改点 4：将 '1' 改为 'L'
+    if "5" not in ENABLED_PAGES: return
+    print("生成 Page 5: 混合天气看板...")
+    # 🔧修改点 5：将 '1' 改为 'L'
     img = Image.new('1', (400, 300), color=255)
     draw = ImageDraw.Draw(img)
 
     weather = get_hybrid_weather()
     if weather["temp_curr"] == 0 and not weather["forecasts"]:
         draw.text((20, 50), "天气数据获取失败，请检查 API Key 或网络", font=font_item, fill=0)
-        push_image(img, 4)
+        push_image(img, 5)
         return
 
     draw.text((20, 10), CITY_DISPLAY_NAME, font=font_title, fill=0)
@@ -437,7 +445,7 @@ def task_weather_dashboard():
     for i, line in enumerate(advice_lines[:2]):
         draw.text((20, 262 + i*24), f"[衣] {line}", font=font_item, fill=0)
 
-    push_image(img, 4)
+    push_image(img, 5)
 
 # ================= 主程序 =================
 if __name__ == "__main__":
