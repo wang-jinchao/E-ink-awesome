@@ -254,29 +254,51 @@ def task_hotlist():
                 
         return last_idx
 
-    next_s = 0
+    # next_s = 0
+    # if "1" in ENABLED_PAGES:
+    #     print("生成 Page 1: 热搜 (上)...")
+    #     # 🔧修改点 1：将 '1' 改为 'L'
+    #     img1 = Image.new('1', (400, 300), color=255)
+    #     next_s = draw_list(ImageDraw.Draw(img1), f"◆ {title_display} (一)", titles, 0)
+    #     push_image(img1, 1)
+
+    # if "2" in ENABLED_PAGES:
+    #     print("生成 Page 2: 热搜 (中)...")
+    #     # 🔧修改点 2：将 '1' 改为 'L'
+    #     img2 = Image.new('1', (400, 300), color=255)
+    #     start_index = next_s if "1" in ENABLED_PAGES else 7
+    #     draw_list(ImageDraw.Draw(img2), f"◆ {title_display} (二)", titles, start_index)
+    #     push_image(img2, 2)
+
+    # if "3" in ENABLED_PAGES:
+    #     print("生成 Page 3: 热搜 (下)...")
+    #     # 🔧修改点 3：将 '1' 改为 'L'
+    #     img3 = Image.new('1', (400, 300), color=255)
+    
+    #     draw_list(ImageDraw.Draw(img3), f"◆ {title_display} (三)", titles, next_s)
+    #     push_image(img3, 3)
+
+    next_s = 0 # 全局接力游标
     if "1" in ENABLED_PAGES:
         print("生成 Page 1: 热搜 (上)...")
-        # 🔧修改点 1：将 '1' 改为 'L'
         img1 = Image.new('1', (400, 300), color=255)
-        next_s = draw_list(ImageDraw.Draw(img1), f"◆ {title_display} (一)", titles, 0)
+        next_s = draw_list(ImageDraw.Draw(img1), f"◆ {title_display} (一)", titles, next_s) # 接力
         push_image(img1, 1)
-
+        
     if "2" in ENABLED_PAGES:
         print("生成 Page 2: 热搜 (中)...")
-        # 🔧修改点 2：将 '1' 改为 'L'
         img2 = Image.new('1', (400, 300), color=255)
-        start_index = next_s if "1" in ENABLED_PAGES else 7
-        draw_list(ImageDraw.Draw(img2), f"◆ {title_display} (二)", titles, start_index)
+        # 删除硬编码的 7，直接使用当前接力游标 next_s
+        next_s = draw_list(ImageDraw.Draw(img2), f"◆ {title_display} (二)", titles, next_s) # 接力
         push_image(img2, 2)
-
+        
     if "3" in ENABLED_PAGES:
         print("生成 Page 3: 热搜 (下)...")
-        # 🔧修改点 3：将 '1' 改为 'L'
         img3 = Image.new('1', (400, 300), color=255)
-    
-        draw_list(ImageDraw.Draw(img3), f"◆ {title_display} (三)", titles, next_s)
+        # 同理，继续使用接力游标 next_s
+        next_s = draw_list(ImageDraw.Draw(img3), f"◆ {title_display} (三)", titles, next_s) # 接力
         push_image(img3, 3)
+
 
 # --- 任务：日历（保持不变） ---
 def task_calendar():
