@@ -179,8 +179,8 @@ def get_hotlist_data(source):
             # 核心修复3：正确提取 news 字段（你要的新闻列表）
             news_list = res.get("data", {}).get("news", [])
             # 提取新闻内容
-            # titles = [item for item in news_list]
-            titles = [item.get("title") for item in news_list]
+            titles = [item for item in news_list]
+            # titles = [item.get("title") for item in news_list]
             random.shuffle(titles) 
             result = titles[:20]
             
@@ -199,7 +199,7 @@ def task_hotlist():
     if "1" not in ENABLED_PAGES and "2" not in ENABLED_PAGES and "3" not in ENABLED_PAGES:
         return
         
-    source_map = {"zhihu": "知乎热榜", "bilibili": "B站热搜", "github": "GitHub 热门","60s": "60s热点"}
+    source_map = {"zhihu": "知乎热榜", "bilibili": "B站热搜", "github": "GitHub 热门","60s": "热点"}
     titles = get_hotlist_data(HOTLIST_SOURCE)
     title_display = source_map.get(HOTLIST_SOURCE, "热门看板")
 
