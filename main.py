@@ -152,6 +152,7 @@ def get_lunar_or_festival(y, m, d):
 # --- 获取数据的逻辑 (支持切换源) ---
 def get_hotlist_data(source):
     titles = []
+    result = [] 
     print(f"正在从 {source} 获取数据...")
     try:
         if source == "zhihu":
@@ -181,13 +182,16 @@ def get_hotlist_data(source):
             # titles = [item for item in news_list]
             titles = [item.get("title") for item in news_list]
             random.shuffle(titles) 
+            result = titles[:20]
             
         else:
-            titles = ["不支持的数据源"]
+            result = ["不支持的数据源"]
     except Exception as e:
         print(f"获取失败: {e}")
-        titles = ["数据获取失败，请检查配置"] * 10
-    return titles[:20]
+        result = ["数据获取失败，请检查配置"] * 10
+        
+    # return titles[:20]
+    return result
 
 
 # --- 任务：热搜看板 ---
