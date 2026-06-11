@@ -2,6 +2,7 @@ import os
 import requests
 import calendar
 import re
+import random
 from PIL import Image, ImageDraw, ImageFont
 from datetime import datetime, timedelta
 from zhdate import ZhDate
@@ -177,7 +178,9 @@ def get_hotlist_data(source):
             # 核心修复3：正确提取 news 字段（你要的新闻列表）
             news_list = res.get("data", {}).get("news", [])
             # 提取新闻内容
-            titles = [item for item in news_list]
+            # titles = [item for item in news_list]
+            titles = [item.get("title") for item in news_list]
+            random.shuffle(titles) 
             
         else:
             titles = ["不支持的数据源"]
