@@ -211,40 +211,53 @@ def task_hotlist():
         return lines
 
     def draw_list(draw, page_title, items, start_idx):
+        # 标题栏：保留原样式，确保新闻区域头部可读性（不影响其他模块）
         draw.rounded_rectangle([(10, 10), (390, 45)], radius=8, fill=0)
         draw.text((20, 15), page_title, font=font_title, fill=255)
         
-        y, last_idx = 55, start_idx
-        item_gap = 12       # 条目间距
-        line_height = 23    # 18号字的行高
-        
+        # ===== 新闻列表专属样式（仅作用于新闻展示区域，不影响日历/天气模块）=====
+        # 列表项正文：由全局 18 号缩小到 14 号；序号：由全局 14 号缩小到 12 号
+        font_news_item = ImageFont.truetype(FONT_PATH, 14)
+        font_news_num  = ImageFont.truetype(FONT_PATH, 12)
+        y, last_idx = 48, start_idx
+        item_gap    = 4    # 条目间距：由 12 收紧到 4（优化布局间距）
+        line_height = 17   # 14 号字的行高
+        box_w, box_h = 28, 17   # 序号框尺寸（适配 12 号字）
+        text_x      = 42        # 正文起始 X（序号框右侧留 4px）
+        max_w       = 340       # 正文最大像素宽度（400 - 42 - 15 留白）
+
         for i in range(start_idx, len(items)):
-            # 屏幕总宽400，文字从X=45开始，右边留白15，所以最大像素宽度是 340
-            lines = wrap_text_by_pixels(draw, items[i], font_item, max_width=340) 
-            
+            # 屏幕总宽400，文字从 X=text_x 开始，右边留白 15，最大像素宽度 340
+            lines = wrap_text_by_pixels(draw, items[i], font_news_item, max_width=max_w)
             required_h = len(lines) * line_height
-            if y + required_h > 295: 
+            # 单页可绘制区域下边界为 295；紧凑布局下可完整容纳 10 条新闻
+            if y + max(box_h, required_h) > 295:
                 break
-            
+
             current_num = i + 1
-            
-            # 左侧黑底数字序号框 (适配 18 号字)
-            draw.rounded_rectangle([(10, y), (36, y+24)], radius=6, fill=0)
-            num_x = 18 if current_num < 10 else 11
-            draw.text((num_x, y+3), str(current_num), font=font_small, fill=255)
-            
-            curr_y = y + 1
+            # 左侧黑底数字序号框（适配 12 号字，水平居中）
+            draw.rounded_rectangle([(10, y), (10 + box_w, y + box_h)], radius=5, fill=0)
+            try:
+                nb = draw.textbbox((0, 0), str(current_num), font=font_news_num)
+                num_w = nb[2] - nb[0]
+            except Exception:
+                num_w = 7 * len(str(current_num))
+            num_x = 10 + (box_w - num_w) // 2
+            num_y = y + (box_h - 12) // 2 + 1
+            draw.text((num_x, num_y), str(current_num), font=font_news_num, fill=255)
+
+            curr_y = y
             for line in lines:
-                draw.text((45, curr_y), line, font=font_item, fill=0)
+                draw.text((text_x, curr_y), line, font=font_news_item, fill=0)
                 curr_y += line_height
-                
-            y += max(24, required_h) + item_gap
+
+            y += max(box_h, required_h) + item_gap
             last_idx = i + 1
-            
-            # 画分割线
+
+            # 画分割线（仅当下方仍有空间时）
             if y < 290:
-                draw.line([(45, y - item_gap/2), (380, y - item_gap/2)], fill=0, width=1)
-                
+                draw.line([(text_x, y - item_gap / 2), (385, y - item_gap / 2)], fill=0, width=1)
+
         return last_idx
 
     next_s = 0 # 全局接力游标
