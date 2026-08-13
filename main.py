@@ -211,31 +211,44 @@ def task_hotlist():
         return lines
 
     def draw_list(draw, page_title, items, start_idx):
-        # 标题栏：保留原样式，确保新闻区域头部可读性（不影响其他模块）
-        draw.rounded_rectangle([(10, 10), (390, 45)], radius=8, fill=0)
-        draw.text((20, 15), page_title, font=font_title, fill=255)
+        # 标题栏：黑框 + 文字水平左对齐、垂直居中（不影响日历/天气等其它模块）
+        title_box = [(10, 10), (390, 45)]          # 黑框：水平方向基本居中于 400 宽页面
+        draw.rounded_rectangle(title_box, radius=8, fill=0)
+        font_news_title = ImageFont.truetype(FONT_PATH, 18)
+        tb = draw.textbbox((0, 0), page_title, font=font_news_title)
+        tw, th = tb[2] - tb[0], tb[3] - tb[1]
+        bx0, by0, bx1, by1 = 10, 10, 390, 45
+        title_pad_left = 18                         # 标题文字左侧留白
+        # 水平：左对齐（文字左缘固定在左边距）；垂直：文字包围盒在黑框内居中
+        title_x = bx0 + title_pad_left - tb[0]
+        title_y = by0 + (by1 - by0 - th) / 2 - tb[1]
+        draw.text((title_x, title_y), page_title, font=font_news_title, fill=255)
         
-        # ===== 新闻列表专属样式（仅作用于新闻展示区域，不影响日历/天气模块）=====
-        # 列表项正文：由全局 18 号缩小到 14 号；序号：由全局 14 号缩小到 12 号
-        font_news_item = ImageFont.truetype(FONT_PATH, 14)
-        font_news_num  = ImageFont.truetype(FONT_PATH, 12)
-        y, last_idx = 48, start_idx
-        item_gap    = 4    # 条目间距：由 12 收紧到 4（优化布局间距）
-        line_height = 17   # 14 号字的行高
-        box_w, box_h = 28, 17   # 序号框尺寸（适配 12 号字）
-        text_x      = 42        # 正文起始 X（序号框右侧留 4px）
-        max_w       = 340       # 正文最大像素宽度（400 - 42 - 15 留白）
+        # ===== 新闻列表专属样式（单页最多 5 条，字号更小，与标题留距）=====
+        font_news_item = ImageFont.truetype(FONT_PATH, 13)
+        font_news_num  = ImageFont.truetype(FONT_PATH, 11)
+        y, last_idx = 62, start_idx
+        item_gap    = 22   # 条目间距：由 4 放宽到 22，让 5 条疏朗分布
+        line_height = 16   # 13 号字的行高
+        box_w, box_h = 26, 16   # 序号框尺寸（适配 11 号字）
+        text_x      = 40        # 正文起始 X（序号框右侧留 4px）
+        max_w       = 342       # 正文最大像素宽度（400 - 40 - 15 留白）
+        max_items_per_page = 5  # 单页最多显示 5 条新闻
 
         for i in range(start_idx, len(items)):
-            # 屏幕总宽400，文字从 X=text_x 开始，右边留白 15，最大像素宽度 340
+            # 单页 5 条限制
+            if i - start_idx >= max_items_per_page:
+                break
+
+            # 屏幕总宽400，文字从 X=text_x 开始，右边留白 15，最大像素宽度 342
             lines = wrap_text_by_pixels(draw, items[i], font_news_item, max_width=max_w)
             required_h = len(lines) * line_height
-            # 单页可绘制区域下边界为 295；紧凑布局下可完整容纳 10 条新闻
+            # 单页可绘制区域下边界为 295；超过则保护性中断
             if y + max(box_h, required_h) > 295:
                 break
 
             current_num = i + 1
-            # 左侧黑底数字序号框（适配 12 号字，水平居中）
+            # 左侧黑底数字序号框（适配 11 号字，水平居中）
             draw.rounded_rectangle([(10, y), (10 + box_w, y + box_h)], radius=5, fill=0)
             try:
                 nb = draw.textbbox((0, 0), str(current_num), font=font_news_num)
@@ -243,7 +256,7 @@ def task_hotlist():
             except Exception:
                 num_w = 7 * len(str(current_num))
             num_x = 10 + (box_w - num_w) // 2
-            num_y = y + (box_h - 12) // 2 + 1
+            num_y = y + (box_h - 11) // 2 + 1
             draw.text((num_x, num_y), str(current_num), font=font_news_num, fill=255)
 
             curr_y = y
