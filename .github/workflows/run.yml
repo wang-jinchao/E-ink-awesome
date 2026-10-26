@@ -40,13 +40,15 @@ jobs:
         run: python main.py
 
       - name: 保活提交（防止 60 天无活动定时任务被禁用）
-        if: success()
+        if: always()
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          LAST_MSG=$(git log -1 --format=%s)
-          if [[ "$LAST_MSG" == keepalive* ]]; then
-            echo "今日已保活，跳过提交"
+          LAST=$(git log -1 --format=%ct)
+          AGE=$(( ($(date +%s) - LAST) / 86400 ))
+          echo "最后提交距今 ${AGE} 天"
+          if [[ "$AGE" -lt 45 ]]; then
+            echo "未满 45 天，跳过保活提交"
           else
             git commit --allow-empty -m "keepalive [skip ci] $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
             git push
